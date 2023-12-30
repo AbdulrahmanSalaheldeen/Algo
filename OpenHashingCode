@@ -1,0 +1,73 @@
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.next = None  # Pointer to the next node in the linked list
+
+class OpenHashing:
+    def __init__(self, size):
+        self.size = size
+        self.hash_table = [None] * size  # Initialize hash table as a list of 'size' elements
+
+    def hash_function(self, key):
+        return hash(key) % self.size  # Generate an index using the hash value of the key
+
+    def insert(self, key, value):
+        index = self.hash_function(key)
+        if self.hash_table[index] is None:
+            # If the index in the hash table is empty, insert a new node
+            self.hash_table[index] = Node(key, value)
+        else:
+            # If the index is not empty, traverse the linked list and add a new node at the end
+            current = self.hash_table[index]
+            while current.next:
+                current = current.next
+            current.next = Node(key, value)
+
+    def search(self, key):
+        index = self.hash_function(key)
+        current = self.hash_table[index]
+        while current:
+            # Traverse the linked list at the index and return the value if the key is found
+            if current.key == key:
+                return current.value
+            current = current.next
+        return None  # Return None if the key is not found
+
+    def delete(self, key):
+        index = self.hash_function(key)
+        current = self.hash_table[index]
+        prev = None
+        while current:
+            if current.key == key:
+                if prev:
+                    # If the node to be deleted is not the head, adjust pointers to skip the current node
+                    prev.next = current.next
+                else:
+                    # If the node to be deleted is the head, update the head of the linked list
+                    self.hash_table[index] = current.next
+                current = None  # Remove the node from memory
+                return True  # Node with the key was found and removed
+            prev = current
+            current = current.next
+        return False  # Node with the key was not found
+
+    def display(self):
+        # Display the contents of the hash table along with linked list elements at each index
+        for index, node in enumerate(self.hash_table):
+            print(f"Index {index}: ", end="")
+            while node:
+                print(f"({node.key}: {node.value})", end=" -> ")
+                node = node.next
+            print("None")
+
+# Example usage:
+hash_table = OpenHashing(10)
+hash_table.insert('apple', 5)
+hash_table.insert('banana', 7)
+print(hash_table.search('apple'))  # Output: 5
+print(hash_table.search('banana'))  # Output: 7
+hash_table.delete('apple')
+print(hash_table.search('apple'))  # Output: None
+
+hash_table.display()  # Display the contents of the hash table
